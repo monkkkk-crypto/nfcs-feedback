@@ -87,7 +87,7 @@
             </div>
             <div id="results-container" class="hidden text-center">
                 <h2 class="text-3xl md:text-4xl font-bold nfcs-blue mb-4">Thank You! Your Voice Counts!</h2>
-                <p class="text-gray-600 text-lg mb-8">Here’s what our community thinks:</p>
+                <p class="text-gray-600 text-lg mb-8">Here's what our community thinks:</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
                     <div class="bg-white p-6 rounded-xl shadow-md"><canvas id="visionChart"></canvas></div>
                     <div class="bg-white p-6 rounded-xl shadow-md"><canvas id="reasonChart"></canvas></div>
@@ -285,7 +285,7 @@
                 resultsContainer.classList.add('active');
 
                 // Fetch real data
-                const response = await fetch('/api/results');
+                const response = await fetch('https://your-railway-app.up.railway.app/results');
                 const data = await response.json();
 
                 activeCharts.forEach(chart => chart.destroy());
@@ -339,7 +339,7 @@
             surveyForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 saveAnswer();
-                await fetch('/api/submit', {
+                await fetch('https://your-railway-app.up.railway.app/submit', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(userAnswers)
