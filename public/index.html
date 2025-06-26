@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NFCS Revitalization Survey</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f0f4f8; }
+        .nfcs-blue { color: #0033A0; }
+        .nfcs-red { color: #DA291C; }
+        .bg-nfcs-blue { background-color: #0033A0; }
+        .bg-nfcs-red { background-color: #DA291C; }
+        .survey-step { display: none; animation: fadeIn 0.5s ease-in-out; }
+        .survey-step.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .custom-choice:checked + label {
+            background-color: #0033A0; color: white; border-color: #0033A0;
+            box-shadow: 0 4px 14px rgba(0, 51, 160, 0.3);
+        }
+        .custom-choice:checked + label svg { transform: scale(1); }
+        .custom-choice:disabled + label {
+            cursor: not-allowed; background-color: #e5e7eb; color: #9ca3af;
+        }
+        .custom-choice:disabled + label > span { text-decoration: line-through; }
+    </style>
+</head>
+<body class="antialiased text-gray-800">
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <svg class="h-12 w-12" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M50 5 L90 25 V75 L50 95 L10 75 V25 Z" fill="white" stroke="#0033A0" stroke-width="2"/>
+                    <path d="M10 25 L90 25" stroke="#0033A0" stroke-width="2"/>
+                    <path d="M50 25 V95" stroke="#0033A0" stroke-width="2"/>
+                    <path d="M10 50 H90" stroke="#0033A0" stroke-width="2"/>
+                    <path d="M50 26 L40 36 L45 41 L50 36 L55 41 L60 36 L50 26" fill="#DA291C"/>
+                    <text x="25" y="45" font-family="Poppins" font-weight="bold" font-size="12" fill="#DA291C" text-anchor="middle">N</text>
+                    <text x="75" y="45" font-family="Poppins" font-weight="bold" font-size="12" fill="#DA291C" text-anchor="middle">F</text>
+                    <text x="25" y="65" font-family="Poppins" font-weight="bold" font-size="12" fill="#DA291C" text-anchor="middle">C</text>
+                    <text x="75" y="65" font-family="Poppins" font-weight="bold" font-size="12" fill="#DA291C" text-anchor="middle">S</text>
+                </svg>
+                <h1 class="text-xl md:text-2xl font-bold nfcs-blue">NFCS Revitalization</h1>
+            </div>
+            <a href="#survey-section" class="hidden md:inline-block bg-nfcs-red text-white font-semibold px-6 py-2 rounded-full hover:bg-opacity-90">Take Survey</a>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <main class="container mx-auto px-6 py-12 md:py-24 text-center">
+        <h2 class="text-3xl md:text-5xl font-extrabold text-gray-900 leading-tight">
+            Shape Our <span class="nfcs-blue">NFCS</span>! Make It <span class="nfcs-red">Epic</span>!
+        </h2>
+        <p class="mt-6 max-w-2xl mx-auto text-lg text-gray-600">
+            Your feedback will transform NFCS into a vibrant, inclusive community for faith, studies, and fun. Take our 5-minute survey now!
+        </p>
+        <a href="#survey-section" class="mt-8 inline-block bg-nfcs-blue text-white font-bold px-10 py-4 rounded-full text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1">Start Survey</a>
+    </main>
+
+    <!-- Survey Section -->
+    <section id="survey-section" class="bg-white py-16 md:py-24">
+        <div class="container mx-auto px-6">
+            <div id="survey-container" class="max-w-2xl mx-auto bg-gray-50 p-6 sm:p-8 rounded-2xl shadow-lg border border-gray-200">
+                <div class="mb-8">
+                    <div class="flex justify-between mb-2">
+                        <span id="progress-text" class="text-sm font-semibold nfcs-blue">Step 1</span>
+                        <span id="progress-percent" class="text-sm font-semibold nfcs-blue">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div id="progress-bar" class="bg-nfcs-red h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+                <form id="survey-form" action="/api/submit" method="POST">
+                    <!-- Steps injected by JavaScript -->
+                </form>
+                <div class="mt-8 flex justify-between items-center">
+                    <button type="button" id="back-btn" class="bg-gray-300 text-gray-700 font-semibold px-6 py-2 rounded-full hover:bg-gray-400 hidden">Back</button>
+                    <button type="button" id="next-btn" class="bg-nfcs-blue text-white font-bold px-8 py-3 rounded-full hover:bg-opacity-90 ml-auto">Next</button>
+                    <button type="submit" id="submit-btn" form="survey-form" class="bg-nfcs-red text-white font-bold px-8 py-3 rounded-full hover:bg-opacity-90 ml-auto hidden">Submit & See Results</button>
+                </div>
+            </div>
+            <div id="results-container" class="hidden text-center">
+                <h2 class="text-3xl md:text-4xl font-bold nfcs-blue mb-4">Thank You! Your Voice Counts!</h2>
+                <p class="text-gray-600 text-lg mb-8">Here’s what our community thinks:</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+                    <div class="bg-white p-6 rounded-xl shadow-md"><canvas id="visionChart"></canvas></div>
+                    <div class="bg-white p-6 rounded-xl shadow-md"><canvas id="reasonChart"></canvas></div>
+                    <div class="bg-white p-6 rounded-xl shadow-md"><canvas id="academicChart"></canvas></div>
+                    <div class="bg-white p-6 rounded-xl shadow-md"><canvas id="connectionChart"></canvas></div>
+                    <div class="bg-white p-6 rounded-xl shadow-md"><canvas id="sportsChart"></canvas></div>
+                    <div class="bg-white p-6 rounded-xl shadow-md"><canvas id="socialChart"></canvas></div>
+                    <div class="bg-white p-6 rounded-xl shadow-md"><canvas id="spiritualChart"></canvas></div>
+                    <div class="bg-white p-6 rounded-xl shadow-md"><canvas id="maleBarrierChart"></canvas></div>
+                    <div class="bg-white p-6 rounded-xl shadow-md"><canvas id="bestDayChart"></canvas></div>
+                    <div class="bg-white p-6 rounded-xl shadow-md"><canvas id="venueChart"></canvas></div>
+                    <div class="md:col-span-2 bg-white p-6 rounded-xl shadow-md">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Your Ideas</h3>
+                        <div id="ideas-wall" class="space-y-4 text-left max-h-64 overflow-y-auto p-4 bg-gray-100 rounded-lg"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Links Section -->
+    <section class="py-16 bg-gray-100">
+        <div class="container mx-auto px-6 text-center">
+            <div class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-lg border border-gray-200">
+                <h3 class="text-2xl font-bold nfcs-blue mb-4">Explore Our Vision</h3>
+                <p class="text-gray-600 mb-6">Check out this mockup NFCS website I created!</p>
+                <a href="https://nfcs.netlify.app" target="_blank" class="inline-flex items-center space-x-2 bg-nfcs-red text-white font-semibold px-8 py-3 rounded-full hover:bg-opacity-90">
+                    <span>Visit Mockup Site</span>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="container mx-auto px-6 text-center">
+            <p class="flex items-center justify-center space-x-2 text-gray-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                <span>Created by</span>
+                <a href="https://hackervirus.netlify.app" target="_blank" class="font-bold nfcs-red hover:underline">Hack3r Viru$</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const surveyQuestions = [
+                { id: 'level', type: 'radio', question: "What's your level of study?", options: ["100 Level", "200 Level", "300 Level", "400 Level", "500+ Level"] },
+                { id: 'department', type: 'radio', question: "Which department are you in?", options: ["Nursing/Midwifery", "Medical/Dental", "Other"] },
+                { id: 'gender', type: 'radio', question: "What is your gender?", options: ["Male", "Female"] },
+                { id: 'residence', type: 'radio', question: "Where do you reside?", options: ["Hostel", "Off-Campus"] },
+                { id: 'attendance', type: 'radio', question: "How often do you attend NFCS meetings?", options: ["Never", "Once/Twice", "Monthly", "Weekly"] },
+                { id: 'reason', type: 'checkbox', max: 2, question: "Why don't you attend regularly? (Pick up to 2)", options: ["Inconvenient time/day", "Venue too far", "Uninteresting activities", "Don't feel included", "Busy with studies", "Unaware of events", "Prioritize FECAMDS/other"] },
+                { id: 'vision', type: 'radio', question: "What should NFCS be?", options: ["A Spiritual Hub", "An Academic Support Network", "A Social/Fun Community", "A Professional Networking Platform"] },
+                { id: 'fecamds', type: 'radio', question: "For Med/Dental students: What would make you active in both NFCS and FECAMDS?", options: ["Unique social events", "Stronger spiritual programs", "Professional networking", "Unlikely to attend both"], condition: (answers) => answers.department === 'Medical/Dental' },
+                { id: 'academic', type: 'radio', question: "What's most valuable for academic support?", options: ["Peer tutorials for tough courses", "Workshops on study skills/CV writing", "Study marathons with shared resources"] },
+                { id: 'connection', type: 'radio', question: "What networking would excite you?", options: ["Alumni career talks", "Student business showcases", "Job/internship opportunity sharing"] },
+                { id: 'sports', type: 'radio', question: "What sports would you attend?", options: ["Football tournaments (male-focused)", "Volleyball games (female-focused)", "Interdepartmental sports festivals"] },
+                { id: 'social', type: 'radio', question: "What social event sounds fun?", options: ["Big events (dinners, parties)", "Casual hangouts (BBQ, games)", "Movie nights (Nollywood/inspirational)"] },
+                { id: 'spiritual', type: 'radio', question: "What spiritual activity appeals most?", options: ["Vibrant praise & worship", "Rosary/Adoration", "Retreats with confessions", "Community outreach"] },
+                { id: 'male_barrier', type: 'radio', question: "For guys: What's the biggest barrier?", options: ["Feels like a 'girls-only' club", "Activities not male-oriented", "Spiritual style not appealing", "Prefer hanging with course mates"], condition: (answers) => answers.gender === 'Male' },
+                { id: 'male_solution', type: 'radio', question: "For guys: What would make you attend?", options: ["More sports/gaming events", "Career talks with male professionals", "'Men of Faith' group", "More male attendees"], condition: (answers) => answers.gender === 'Male' },
+                { id: 'best_day', type: 'radio', question: "Best day for main meeting?", options: ["Saturday Afternoon", "Saturday Evening", "Sunday Afternoon", "Sunday Evening", "Weekday Evening"] },
+                { id: 'duration', type: 'radio', question: "Ideal meeting duration?", options: ["1 hour", "1.5 hours", "2 hours"] },
+                { id: 'venue', type: 'radio', question: "Preferred venue?", options: ["Always Hostel", "Always Church", "Alternate Hostel/Church", "Neutral Campus Classroom"] },
+                { id: 'transport', type: 'slider', question: "Willingness to attend Church with transport?", min: 1, max: 5 },
+                { id: 'communication', type: 'radio', question: "How do you prefer to hear about events?", options: ["WhatsApp", "Instagram", "Class Announcements", "Mass Announcements"] },
+                { id: 'role', type: 'radio', question: "Interested in a small role?", options: ["Organize events", "Help with publicity", "Maybe later", "Just attend"] },
+                { id: 'leadership', type: 'radio', question: "Most valued leadership trait?", options: ["Spiritually inspiring", "Organized", "Friendly", "Creative"] },
+                { id: 'alumni', type: 'radio', question: "How should we involve alumni?", options: ["Career talks/workshops", "Mentorship programs", "Fundraising for events", "Social event appearances"] },
+                { id: 'idea', type: 'textarea', question: "One idea to make NFCS epic?", placeholder: "Your idea could change everything..." },
+                { id: 'thoughts', type: 'textarea', question: "Any other ideas or concerns?", placeholder: "Share your thoughts..." }
+            ];
+
+            const surveyForm = document.getElementById('survey-form');
+            const nextBtn = document.getElementById('next-btn');
+            const backBtn = document.getElementById('back-btn');
+            const submitBtn = document.getElementById('submit-btn');
+            const progressText = document.getElementById('progress-text');
+            const progressBar = document.getElementById('progress-bar');
+            const progressPercent = document.getElementById('progress-percent');
+            const surveyContainer = document.getElementById('survey-container');
+            const resultsContainer = document.getElementById('results-container');
+            let currentStep = 0;
+            const userAnswers = {};
+            let activeCharts = [];
+
+            function getVisibleQuestions() {
+                return surveyQuestions.filter(q => !q.condition || q.condition(userAnswers));
+            }
+
+            function renderStep() {
+                const visibleQuestions = getVisibleQuestions();
+                const stepData = visibleQuestions[currentStep];
+                if (!stepData) return;
+
+                surveyForm.innerHTML = '';
+                const stepDiv = document.createElement('div');
+                stepDiv.className = 'survey-step active';
+                let content = `<h3 class="text-xl md:text-2xl font-bold mb-6 text-gray-800">${stepData.question}</h3>`;
+
+                if (stepData.type === 'radio' || stepData.type === 'checkbox') {
+                    content += '<div class="space-y-3">';
+                    stepData.options.forEach((option, index) => {
+                        const inputId = `${stepData.id}-${index}`;
+                        const isChecked = userAnswers[stepData.id] && (Array.isArray(userAnswers[stepData.id]) ? userAnswers[stepData.id].includes(option) : userAnswers[stepData.id] === option);
+                        const isDisabled = stepData.type === 'checkbox' && userAnswers[stepData.id]?.length >= stepData.max && !isChecked;
+                        content += `
+                            <div>
+                                <input type="${stepData.type}" name="${stepData.id}" id="${inputId}" value="${option}" class="custom-choice hidden" ${isChecked ? 'checked' : ''} ${isDisabled ? 'disabled' : ''}>
+                                <label for="${inputId}" class="flex items-center justify-between w-full p-4 text-gray-600 bg-white border-2 border-gray-200 rounded-lg cursor-pointer hover:bg-gray-100 transition-all">
+                                    <span class="font-semibold">${option}</span>
+                                    <svg class="w-6 h-6 ml-3 text-white transform scale-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                </label>
+                            </div>`;
+                    });
+                    content += '</div>';
+                    if (stepData.max) content += `<p class="text-sm text-gray-500 mt-4">Select up to ${stepData.max} options.</p>`;
+                } else if (stepData.type === 'textarea') {
+                    content += `<textarea rows="4" id="${stepData.id}" name="${stepData.id}" placeholder="${stepData.placeholder}" class="w-full p-4 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-nfcs-blue">${userAnswers[stepData.id] || ''}</textarea>`;
+                } else if (stepData.type === 'slider') {
+                    content += `
+                        <input type="range" id="${stepData.id}" name="${stepData.id}" min="${stepData.min}" max="${stepData.max}" value="${userAnswers[stepData.id] || 3}" class="w-full h-2 bg-gray-200 rounded-lg cursor-pointer">
+                        <div class="flex justify-between text-sm text-gray-600 mt-2">
+                            <span>1 (Unwilling)</span><span>5 (Very Willing)</span>
+                        </div>`;
+                }
+
+                stepDiv.innerHTML = content;
+                surveyForm.appendChild(stepDiv);
+
+                if (stepData.type === 'checkbox') {
+                    const checkboxes = stepDiv.querySelectorAll('input[type="checkbox"]');
+                    checkboxes.forEach(checkbox => {
+                        checkbox.addEventListener('change', () => {
+                            const checkedCount = stepDiv.querySelectorAll('input[type="checkbox"]:checked').length;
+                            checkboxes.forEach(cb => {
+                                const label = cb.nextElementSibling;
+                                if (checkedCount >= stepData.max && !cb.checked) {
+                                    cb.disabled = true;
+                                    label.classList.add('opacity-50', 'cursor-not-allowed');
+                                } else {
+                                    cb.disabled = false;
+                                    label.classList.remove('opacity-50', 'cursor-not-allowed');
+                                }
+                            });
+                        });
+                    });
+                }
+            }
+
+            function saveAnswer() {
+                const visibleQuestions = getVisibleQuestions();
+                const stepData = visibleQuestions[currentStep];
+                if (!stepData) return;
+
+                if (stepData.type === 'radio') {
+                    const selected = surveyForm.querySelector(`input[name="${stepData.id}"]:checked`);
+                    if (selected) userAnswers[stepData.id] = selected.value;
+                } else if (stepData.type === 'checkbox') {
+                    userAnswers[stepData.id] = Array.from(surveyForm.querySelectorAll(`input[name="${stepData.id}"]:checked`)).map(cb => cb.value);
+                } else if (stepData.type === 'textarea' || stepData.type === 'slider') {
+                    userAnswers[stepData.id] = surveyForm.querySelector(`#${stepData.id}`).value;
+                }
+            }
+
+            function updateUI() {
+                const visibleQuestions = getVisibleQuestions();
+                const totalSteps = visibleQuestions.length;
+                const percentage = totalSteps > 1 ? Math.round((currentStep / (totalSteps - 1)) * 100) : 100;
+                progressText.textContent = `Step ${currentStep + 1} of ${totalSteps}`;
+                progressBar.style.width = `${percentage}%`;
+                progressPercent.textContent = `${percentage}%`;
+                backBtn.classList.toggle('hidden', currentStep === 0);
+                nextBtn.classList.toggle('hidden', currentStep === totalSteps - 1);
+                submitBtn.classList.toggle('hidden', currentStep !== totalSteps - 1);
+            }
+
+            function handleNavigation(direction) {
+                saveAnswer();
+                const visibleQuestions = getVisibleQuestions();
+                if (direction === 'next' && currentStep < visibleQuestions.length - 1) {
+                    currentStep++;
+                } else if (direction === 'back' && currentStep > 0) {
+                    currentStep--;
+                }
+                renderStep();
+                updateUI();
+            }
+
+            async function showResults() {
+                surveyContainer.style.display = 'none';
+                resultsContainer.style.display = 'block';
+                resultsContainer.classList.add('active');
+
+                // Fetch real data
+                const response = await fetch('/api/results');
+                const data = await response.json();
+
+                activeCharts.forEach(chart => chart.destroy());
+                activeCharts = [];
+
+                const createChart = (elementId, type, title, dataObj, colors) => {
+                    const chart = new Chart(document.getElementById(elementId), {
+                        type,
+                        data: {
+                            labels: Object.keys(dataObj),
+                            datasets: [{ data: Object.values(dataObj), backgroundColor: colors || ['#0033A0', '#DA291C', '#FACC15', '#34D399'], borderColor: '#fff', borderWidth: type === 'doughnut' ? 4 : 0 }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: { legend: { position: type === 'doughnut' ? 'top' : 'none' }, title: { display: true, text: title, font: { size: 18 } } },
+                            indexAxis: type === 'bar' && elementId === 'maleBarrierChart' ? 'y' : 'x'
+                        }
+                    });
+                    activeCharts.push(chart);
+                };
+
+                createChart('visionChart', 'bar', 'What Should NFCS Be?', data.vision);
+                createChart('reasonChart', 'doughnut', 'Reasons for Low Attendance', data.reason);
+                createChart('academicChart', 'bar', 'Preferred Academic Activities', data.academic);
+                createChart('connectionChart', 'bar', 'Preferred Networking Activities', data.connection);
+                createChart('sportsChart', 'bar', 'Preferred Sports Activities', data.sports);
+                createChart('socialChart', 'bar', 'Preferred Social Activities', data.social);
+                createChart('spiritualChart', 'bar', 'Preferred Spiritual Activities', data.spiritual);
+                createChart('maleBarrierChart', 'bar', 'Barriers for Male Students', data.male_barrier);
+                createChart('bestDayChart', 'doughnut', 'Best Day for Meetings', data.best_day);
+                createChart('venueChart', 'doughnut', 'Preferred Venue', data.venue);
+
+                const ideasWall = document.getElementById('ideas-wall');
+                ideasWall.innerHTML = '';
+                (data.idea || []).slice(0, 3).forEach(idea => {
+                    const ideaEl = document.createElement('div');
+                    ideaEl.className = 'bg-gray-100 p-4 rounded-lg italic';
+                    ideaEl.innerHTML = `<p class="text-gray-700">“${idea}”</p>`;
+                    ideasWall.appendChild(ideaEl);
+                });
+                if (userAnswers.idea) {
+                    const ideaEl = document.createElement('div');
+                    ideaEl.className = 'bg-blue-100 p-4 rounded-lg italic border-l-4 border-nfcs-blue';
+                    ideaEl.innerHTML = `<p class="text-gray-800 font-semibold">“${userAnswers.idea}”</p><p class="text-right text-sm nfcs-blue">- Your Idea!</p>`;
+                    ideasWall.prepend(ideaEl);
+                }
+            }
+
+            nextBtn.addEventListener('click', () => handleNavigation('next'));
+            backBtn.addEventListener('click', () => handleNavigation('back'));
+            surveyForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                saveAnswer();
+                await fetch('/api/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userAnswers)
+                });
+                showResults();
+            });
+
+            renderStep();
+            updateUI();
+        });
+    </script>
+</body>
+</html>
