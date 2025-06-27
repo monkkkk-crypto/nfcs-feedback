@@ -28,7 +28,7 @@ def read_index():
     return FileResponse(os.path.join("public", "index.html"))
 
 # SQLite setup
-DATABASE_URL = "sqlite:///./survey.db"
+DATABASE_URL = "sqlite:////tmp/survey.db"
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
@@ -146,4 +146,3 @@ async def get_results():
         else:
             results[col] = dict(Counter(values))
     return results 
-
