@@ -1,5 +1,7 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from starlette.responses import FileResponse
 from pydantic import BaseModel
 import requests
 from collections import Counter
@@ -17,6 +19,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Serve static files
+app.mount("/public", StaticFiles(directory="public"), name="public")
+
+# Serve index.html at root
+@app.get("/")
+def read_index():
+    return FileResponse(os.path.join("public", "index.html"))
 
 class SurveyResponse(BaseModel):
     level: str = None
