@@ -76,7 +76,7 @@
                         <div id="progress-bar" class="bg-nfcs-red h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
                     </div>
                 </div>
-                <form id="survey-form" action="/api/submit" method="POST">
+                <form id="survey-form" action="/submit" method="POST">
                     <!-- Steps injected by JavaScript -->
                 </form>
                 <div class="mt-8 flex justify-between items-center">
@@ -285,7 +285,7 @@
                 resultsContainer.classList.add('active');
 
                 // Fetch real data
-                const response = await fetch('https://your-railway-app.up.railway.app/results');
+                const response = await fetch('/results');
                 const data = await response.json();
 
                 activeCharts.forEach(chart => chart.destroy());
@@ -339,7 +339,7 @@
             surveyForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 saveAnswer();
-                await fetch('https://your-railway-app.up.railway.app/submit', {
+                await fetch('/submit', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(userAnswers)
