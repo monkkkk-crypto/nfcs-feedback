@@ -146,3 +146,4 @@ async def get_results():
         else:
             results[col] = dict(Counter(values))
     return results 
+
